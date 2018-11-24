@@ -75,4 +75,27 @@ describe("GraphQL's API Test suite", function() {
     .set('Content-Type', 'application/json')
     .expect(400, done)
   })
+  it("Return a champion filtered by name", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `query GetChampionByName($championName: String!) {
+          getChampionByName(name: $championName) {
+            name
+            attackDamage
+          }
+        }`,
+      variables: {
+        championName: 'Genji'
+      }
+    })
+    .set('Content-Type', 'application/json')
+    .expect(200)
+    .end(function(err, resp) {
+      chk(err, done)
+      assert.equal(resp.body.data.getChampionByName.name, 'Genji')
+      assert.equal(resp.body.data.getChampionByName.attackDamage, 30.5)
+      done()
+    })
+  })
 })
