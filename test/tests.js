@@ -1,9 +1,10 @@
-var app = require('../app');
-var supertest = require('supertest');
-var assert = require('assert');
+const app = require('../app');
+const supertest = require('supertest');
+const assert = require('assert');
+const api_url = '/graphql'
 
 // External dependencies
-var Champion = require('../classes/Champion')
+const Champion = require('../classes/Champion')
 
 function chk(err, done) {
   if (err) {
@@ -18,5 +19,60 @@ describe("GraphQL's API Test suite", function() {
     assert.equal(champion.name, 'Genji')
     assert.equal(champion.attackDamage, 30.50)
     done()
+  })
+  it("Return all champions (only names)", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `{
+          getChampions {
+            name
+          }
+        }`
+    })
+    .set('Content-Type', 'application/json')
+    .expect(200)
+    .end(function(err, resp) {
+      chk(err, done)
+      assert.equal(resp.body.data.getChampions[0].name, 'Genji')
+      assert.equal(resp.body.data.getChampions[1].name, 'Hanzo')
+      assert.equal(resp.body.data.getChampions[1].attackDamage, undefined)
+      done()
+    })
+  })
+  it("Return all champions (all data)", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `{
+          getChampions {
+            name
+            attackDamage
+          }
+        }`
+    })
+    .set('Content-Type', 'application/json')
+    .expect(200)
+    .end(function(err, resp) {
+      chk(err, done)
+      assert.equal(resp.body.data.getChampions[0].name, 'Genji')
+      assert.equal(resp.body.data.getChampions[1].name, 'Hanzo')
+      assert.equal(resp.body.data.getChampions[0].attackDamage, 30.50)
+      assert.equal(resp.body.data.getChampions[1].attackDamage, 70)
+      done()
+    })
+  })
+  it("Return all champions expected 400 Bad Request", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `{
+          getChampions {
+
+          }
+        }`
+    })
+    .set('Content-Type', 'application/json')
+    .expect(400, done)
   })
 })
