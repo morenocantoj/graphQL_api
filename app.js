@@ -13,6 +13,10 @@ const schema = buildSchema(`
     getChampionByName(name: String!): Champion
   }
 
+  type Mutation {
+    updateAttackDamage(name: String!, attackDamage: Float): Champion
+  }
+
   type Champion {
     name: String
     attackDamage: Float
@@ -29,6 +33,12 @@ const rootValue = {
   getChampions: () => champions,
   getChampionByName: ({ name }) => {
     return champions.find(x => x.name === name)
+  },
+  updateAttackDamage: ({name, attackDamage = 80}) => {
+    const champion = champions.find(x => x.name === name)
+    champion.attackDamage = attackDamage
+
+    return champion
   }
 }
 

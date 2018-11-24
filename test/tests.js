@@ -98,4 +98,28 @@ describe("GraphQL's API Test suite", function() {
       done()
     })
   })
+  it("Change a champion's attack damage", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `mutation UpdateAttackDamage($championName: String!, $attackDamage: Float) {
+        updateAttackDamage(name: $championName, attackDamage: $attackDamage) {
+          name
+          attackDamage
+        }
+      }`,
+      variables: {
+        championName: 'Hanzo',
+        attackDamage: 60.50
+      }
+    })
+    .set('Content-Type', 'application/json')
+    .expect(200)
+    .end(function(err, resp) {
+      chk(err, done)
+      assert.equal(resp.body.data.updateAttackDamage.name, 'Hanzo')
+      assert.equal(resp.body.data.updateAttackDamage.attackDamage, 60.50)
+      done()
+    })
+  })
 })
