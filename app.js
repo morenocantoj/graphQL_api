@@ -7,6 +7,11 @@ const schema = buildSchema(`
   type Query {
     language: String
   }
+
+  type Champion {
+    name: String
+    attackDamage: Float
+  }
 `)
 
 const rootValue = {
