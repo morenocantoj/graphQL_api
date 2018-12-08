@@ -122,4 +122,70 @@ describe("GraphQL's API Test suite", function() {
       done()
     })
   })
+  it("Add a new champion to champions array", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `mutation AddChampion($championName: String!, $attackDamage: Float) {
+        addChampion(name: $championName, attackDamage: $attackDamage) {
+          name
+          attackDamage
+        }
+      }`,
+      variables: {
+        championName: 'Tracer',
+        attackDamage: 30.50
+      }
+    })
+    .set('Content-Type', 'application/json')
+    .expect(200)
+    .end(function(err, resp) {
+      chk(err, done)
+      assert.equal(resp.body.data.addChampion.name, 'Tracer')
+      assert.equal(resp.body.data.addChampion.attackDamage, 30.50)
+      done()
+    })
+  })
+  it("Add a new champion to champions array expect a fail inserting one existing", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `mutation AddChampion($championName: String!, $attackDamage: Float) {
+        addChampion(name: $championName, attackDamage: $attackDamage) {
+          name
+          attackDamage
+        }
+      }`,
+      variables: {
+        championName: 'Tracer',
+        attackDamage: 30.50
+      }
+    })
+    .set('Content-Type', 'application/json')
+    .expect(200)
+    .end(function(err, resp) {
+      chk(err, done)
+      assert.equal(resp.body.data. null)
+      assert.equal(resp.body.errors[0].statusCode, 400)
+      assert.equal(resp.body.errors[0].message, "Sorry, that champion is already in the system")
+      done()
+    })
+  })
+  it("Add a new champion to champions array expect a fail because missing name argument", (done) => {
+    supertest(app)
+    .post(api_url)
+    .send({
+      query: `mutation AddChampion($championName: String!, $attackDamage: Float) {
+        addChampion(name: $championName, attackDamage: $attackDamage) {
+          name
+          attackDamage
+        }
+      }`,
+      variables: {
+        attackDamage: 30.50
+      }
+    })
+    .set('Content-Type', 'application/json')
+    .expect(500, done)
+  })
 })
